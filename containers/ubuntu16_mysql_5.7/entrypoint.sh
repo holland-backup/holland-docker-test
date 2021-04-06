@@ -12,10 +12,6 @@ mysqld_safe --user=mysql 2>>/dev/null >>/dev/null &
 
 sleep 20
 
-
-cd /test_db
-mysql < employees.sql 2>&1 >>/dev/null
-
 cd /
 git clone $FORK 2>>/dev/null >>/dev/null
 
