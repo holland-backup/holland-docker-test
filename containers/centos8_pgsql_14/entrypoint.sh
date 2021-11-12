@@ -1,17 +1,11 @@
 #!/usr/bin/env bash
 
-# Configure PostgreSQL install and import sample data
-echo 'host all root 127.0.0.1/32 trust' >> /etc/postgresql/10/main/pg_hba.conf 2>>/dev/null >>/dev/null
-service postgresql restart 2>>/dev/null >>/dev/null
-su -c 'psql -c "CREATE USER root WITH SUPERUSER"' postgres 2>>/dev/null >>/dev/null
+su -c /usr/pgsql-14/bin/initdb -l postgres 2>>/dev/null >>/dev/null
+echo 'host all root 127.0.0.1/32 trust' >> /var/lib/pgsql/14/data/pg_hba.conf 2>>/dev/null >>/dev/null
+su -c '/usr/pgsql-14/bin/pg_ctl -D /var/lib/pgsql/14/data start' postgres 2>>/dev/null >>/dev/null
+sleep 20
+su -c '/usr/pgsql-14/bin/psql -c "CREATE USER root WITH SUPERUSER"' postgres 2>>/dev/null >>/dev/null
 
-mkdir /sqlsample 2>>/dev/null >>/dev/null
-wget http://pgfoundry.org/frs/download.php/527/world-1.0.tar.gz -O /sqlsample/world.tar.gz 2>>/dev/null >>/dev/null
-cd /sqlsample 2>>/dev/null >>/dev/null
-tar -xzf world.tar.gz 2>>/dev/null >>/dev/null
-
-su -c 'psql -c "CREATE DATABASE world"' postgres 2>>/dev/null >>/dev/null
-su -c 'psql -d world < dbsamples-0.1/world/world.sql' postgres 2>>/dev/null >>/dev/null
 
 # Clone the Holland repo and install the base application
 git clone $FORK /holland 2>>/dev/null >>/dev/null
@@ -44,7 +38,6 @@ CMDS=(
 "holland bk pg_basebackup --dry-run"
 "holland bk pg_basebackup"
 )
-
 
 for command in "${CMDS[@]}"
 do

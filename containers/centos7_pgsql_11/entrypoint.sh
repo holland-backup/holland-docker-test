@@ -24,11 +24,19 @@ mkdir -p /etc/holland/{backupsets,providers} /var/log/holland /var/spool/holland
 cp /holland/config/holland.conf /etc/holland/holland.conf 2>>/dev/null >>/dev/null
 cp /holland/config/providers/pgdump.conf /etc/holland/providers/pgdump.conf 2>>/dev/null >>/dev/null
 
+# Install pg_basebackup
+cp /holland/config/providers/pg_basebackup.conf /etc/holland/providers/pg_basebackup.conf 2>>/dev/null >>/dev/null
+cd /holland/plugins/holland.backup.pg_basebackup 2>>/dev/null >>/dev/null
+python3 setup.py install  2>>/dev/null >>/dev/null
+
 # Create backup set, ensure initial check passed, then run backup
 CMDS=(
 "holland mc --name pgdump pgdump"
 "holland bk pgdump --dry-run"
 "holland bk pgdump"
+"holland mc --name pg_basebackup pg_basebackup"
+"holland bk pg_basebackup --dry-run"
+"holland bk pg_basebackup"
 )
 
 for command in "${CMDS[@]}"
